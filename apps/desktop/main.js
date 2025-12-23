@@ -23,7 +23,7 @@ function createWindow() {
   // Load the app
   const startUrl = isDev 
     ? 'http://localhost:3000' 
-    : 'https://software-pos.vercel.app/';
+    : `file://${path.join(__dirname, 'web-build')}/index.html`;
   
   mainWindow.loadURL(startUrl);
 

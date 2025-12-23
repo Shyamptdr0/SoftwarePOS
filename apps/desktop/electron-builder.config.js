@@ -8,7 +8,7 @@ module.exports = {
     "main.js",
     "preload.js", 
     "node_modules/**/*",
-    "../web/out/**/*"
+    "web-build/**/*"
   ],
   win: {
     target: [

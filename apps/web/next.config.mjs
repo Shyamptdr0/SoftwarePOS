@@ -2,11 +2,12 @@
 const nextConfig = {
   /* config options here */
   reactCompiler: true,
-  output: 'export',
-  trailingSlash: true,
-  images: {
-    unoptimized: true
-  }
+  // Remove static export to allow API routes
+  // output: 'export',
+  // trailingSlash: true,
+  // images: {
+  //   unoptimized: true
+  // }
 };
 
 export default nextConfig;

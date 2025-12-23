@@ -39,6 +39,11 @@ jobs:
         cd apps/web
         npm run build
         
+    - name: Copy web build to desktop
+      run: |
+        xcopy "apps\web\.next" "apps\desktop\web-build" /E /I /Y
+      shell: cmd
+        
     - name: Get version
       id: version
       run: |
