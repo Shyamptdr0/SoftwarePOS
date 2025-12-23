@@ -71,10 +71,7 @@ jobs:
     - name: List build artifacts
       run: |
         cd apps/desktop
-        echo "Listing dist directory contents:"
-        Get-ChildItem -Path dist/ -Recurse
-        echo "Looking for .exe files:"
-        Get-ChildItem -Path dist/ -Filter "*.exe" -Recurse
+        echo "Build completed successfully"
         
     - name: Create Release
       uses: softprops/action-gh-release@v1
