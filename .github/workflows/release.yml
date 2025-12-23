@@ -72,9 +72,9 @@ jobs:
       run: |
         cd apps/desktop
         echo "Listing dist directory contents:"
-        ls -la dist/
+        Get-ChildItem -Path dist/ -Recurse
         echo "Looking for .exe files:"
-        find dist/ -name "*.exe" -type f
+        Get-ChildItem -Path dist/ -Filter "*.exe" -Recurse
         
     - name: Create Release
       uses: softprops/action-gh-release@v1
