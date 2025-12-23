@@ -1,0 +1,33 @@
+# dependencies
+/node_modules
+**/node_modules/
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# build outputs
+/dist
+/build
+/.next
+/out
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# misc
+*.pem
