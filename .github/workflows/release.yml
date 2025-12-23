@@ -20,12 +20,19 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: apps/desktop/package-lock.json
         
-    - name: Install dependencies
+    - name: Install root dependencies
+      run: npm ci
+      
+    - name: Install web dependencies
       run: |
+        cd apps/web
         npm ci
-        cd apps/web && npm ci
+        
+    - name: Install desktop dependencies
+      run: |
+        cd apps/desktop
+        npm ci
         
     - name: Build web app
       run: |
@@ -50,8 +57,14 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
+    - name: List build artifacts
+      run: |
+        cd apps/desktop
+        ls -la dist/
+        
     - name: Create Release
       uses: softprops/action-gh-release@v1
+      if: success()
       with:
         name: Shreem POS ${{ steps.version.outputs.version }}
         body: |
