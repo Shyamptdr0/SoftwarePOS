@@ -1,0 +1,33 @@
+{
+  "name": "desktop",
+  "version": "1.0.0",
+  "description": "Shreem POS Desktop Application",
+  "main": "main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "electron .",
+    "dev": "concurrently \"npm run dev:web\" \"wait-on http://localhost:3000 && electron .\"",
+    "dev:web": "cd ../web && npm run dev",
+    "build": "npm run build:web && npm run build:electron",
+    "build:web": "cd ../web && npm run build",
+    "build:electron": "electron-builder --config electron-builder.config.js",
+    "build:win": "electron-builder --config electron-builder.config.js --win",
+    "build:mac": "electron-builder --config electron-builder.config.js --mac", 
+    "build:linux": "electron-builder --config electron-builder.config.js --linux",
+    "dist": "npm run build",
+    "publish": "electron-builder --config electron-builder.config.js --publish always"
+  },
+  "keywords": ["electron", "pos", "desktop", "shreem"],
+  "author": "Shreem POS",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12",
+    "electron-updater": "^6.6.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "wait-on": "^9.0.3"
+  }
+}
