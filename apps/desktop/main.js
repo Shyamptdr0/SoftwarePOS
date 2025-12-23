@@ -1,5 +1,4 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
-const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -23,7 +22,7 @@ function createWindow() {
   // Load the app
   const startUrl = isDev 
     ? 'http://localhost:3000' 
-    : `file://${path.join(__dirname, '../web/out/index.html')}`;
+    : 'https://software-pos.vercel.app/';
   
   mainWindow.loadURL(startUrl);
 
@@ -137,72 +136,9 @@ app.on('window-all-closed', () => {
   }
 });
 
-// Auto-updater configuration
-autoUpdater.checkForUpdatesAndNotify();
+// Auto-updater disabled for electron-packager build
 
-// Auto-updater event handlers
-autoUpdater.on('checking-for-update', () => {
-  console.log('Checking for update...');
-  if (mainWindow) {
-    mainWindow.webContents.send('update-status', { status: 'checking' });
-  }
-});
-
-autoUpdater.on('update-available', (info) => {
-  console.log('Update available:', info);
-  if (mainWindow) {
-    mainWindow.webContents.send('update-status', { status: 'available', info });
-  }
-});
-
-autoUpdater.on('update-not-available', (info) => {
-  console.log('Update not available:', info);
-  if (mainWindow) {
-    mainWindow.webContents.send('update-status', { status: 'not-available', info });
-  }
-});
-
-autoUpdater.on('error', (err) => {
-  console.error('Error in auto-updater:', err);
-  if (mainWindow) {
-    mainWindow.webContents.send('update-status', { status: 'error', error: err.message });
-  }
-});
-
-autoUpdater.on('download-progress', (progressObj) => {
-  let log_message = "Download speed: " + progressObj.bytesPerSecond;
-  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
-  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
-  console.log(log_message);
-  
-  if (mainWindow) {
-    mainWindow.webContents.send('update-progress', {
-      percent: Math.round(progressObj.percent),
-      transferred: progressObj.transferred,
-      total: progressObj.total
-    });
-  }
-});
-
-autoUpdater.on('update-downloaded', (info) => {
-  console.log('Update downloaded:', info);
-  if (mainWindow) {
-    mainWindow.webContents.send('update-status', { status: 'downloaded', info });
-    
-    // Show dialog to restart app
-    dialog.showMessageBox(mainWindow, {
-      type: 'info',
-      title: 'Update Ready',
-      message: 'A new version of Shreem POS is ready to install.',
-      detail: 'The application will restart to complete the update.',
-      buttons: ['Restart Now', 'Later']
-    }).then((result) => {
-      if (result.response === 0) {
-        autoUpdater.quitAndInstall();
-      }
-    });
-  }
-});
+// Auto-updater event handlers (disabled)
 
 // IPC Handlers
 ipcMain.handle('get-app-version', () => {
@@ -210,14 +146,16 @@ ipcMain.handle('get-app-version', () => {
 });
 
 ipcMain.handle('check-for-updates', () => {
-  autoUpdater.checkForUpdatesAndNotify();
+  // Auto-updater disabled
+  return { message: 'Auto-updater disabled in this build' };
 });
 
 ipcMain.handle('get-update-status', () => {
   return {
-    checking: autoUpdater.isCheckingForUpdate(),
-    available: autoUpdater.updateAvailable,
-    downloaded: autoUpdater.updateDownloaded
+    checking: false,
+    available: false,
+    downloaded: false,
+    disabled: true
   };
 });
 

@@ -12,22 +12,27 @@
     "build:web": "cd ../web && npm run build",
     "build:electron": "electron-builder --config electron-builder.config.js",
     "build:win": "electron-builder --config electron-builder.config.js --win",
-    "build:mac": "electron-builder --config electron-builder.config.js --mac", 
+    "build:mac": "electron-builder --config electron-builder.config.js --mac",
     "build:linux": "electron-builder --config electron-builder.config.js --linux",
     "dist": "npm run build",
-    "publish": "electron-builder --config electron-builder.config.js --publish always"
+    "publish": "electron-builder --config electron-builder.config.js --publish always",
+    "pack": "electron-packager . Shreem-POS --platform=win32 --arch=x64 --out=dist --overwrite"
   },
-  "keywords": ["electron", "pos", "desktop", "shreem"],
+  "keywords": [
+    "electron",
+    "pos",
+    "desktop",
+    "shreem"
+  ],
   "author": "Shreem POS",
   "license": "MIT",
   "type": "commonjs",
-  "dependencies": {
-    "electron": "^39.2.7",
-    "electron-builder": "^26.0.12",
-    "electron-updater": "^6.6.2"
-  },
   "devDependencies": {
     "concurrently": "^9.2.1",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12",
+    "electron-packager": "^17.1.2",
+    "electron-updater": "^6.6.2",
     "wait-on": "^9.0.3"
   }
 }
