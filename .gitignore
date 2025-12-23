@@ -20,6 +20,12 @@ yarn-error.log*
 /build
 /.next
 /out
+**/dist
+**/build
+**/out
+apps/desktop/dist/
+apps/web/.next/
+apps/web/out/
 
 # OS files
 .DS_Store
