@@ -7,6 +7,9 @@ on:
       - 'v*'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: windows-latest
@@ -65,7 +68,10 @@ jobs:
     - name: List build artifacts
       run: |
         cd apps/desktop
+        echo "Listing dist directory contents:"
         ls -la dist/
+        echo "Looking for .exe files:"
+        find dist/ -name "*.exe" -type f
         
     - name: Create Release
       uses: softprops/action-gh-release@v1
@@ -82,7 +88,8 @@ jobs:
           1. Download the `.exe` file below
           2. Run the installer
           3. The app will automatically check for updates on startup
-        files: apps/desktop/dist/*.exe
+        files: |
+          apps/desktop/dist/**/*.exe
         draft: false
         prerelease: false
       env:
