@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -136,18 +137,114 @@ app.on('window-all-closed', () => {
   }
 });
 
-// Auto-updater disabled for electron-packager build
+// Auto-updater configuration (only in production)
+if (!isDev) {
+  autoUpdater.checkForUpdatesAndNotify();
+  autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: 'Shyamptdr0', // Replace with your GitHub username
+    repo: 'SoftwarePOS' // Replace with your repository name
+  });
+}
 
-// Auto-updater event handlers (disabled)
+// Auto-updater event handlers
+autoUpdater.on('checking-for-update', () => {
+  console.log('Checking for update...');
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', { checking: true });
+  }
+});
+
+autoUpdater.on('update-available', (info) => {
+  console.log('Update available:', info);
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', { available: true, info });
+    dialog.showMessageBox(mainWindow, {
+      type: 'info',
+      title: 'Update Available',
+      message: 'A new version of Shreem POS is available.',
+      detail: `Version ${info.version} is ready to download.`,
+      buttons: ['Download Now', 'Later']
+    }).then((result) => {
+      if (result.response === 0) {
+        autoUpdater.downloadUpdate();
+      }
+    });
+  }
+});
+
+autoUpdater.on('update-not-available', (info) => {
+  console.log('Update not available:', info);
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', { available: false });
+  }
+});
+
+autoUpdater.on('error', (err) => {
+  console.error('Update error:', err);
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', { error: err.message });
+  }
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+  let log_message = "Download speed: " + progressObj.bytesPerSecond;
+  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+  console.log(log_message);
+  if (mainWindow) {
+    mainWindow.webContents.send('download-progress', {
+      percent: Math.round(progressObj.percent),
+      transferred: progressObj.transferred,
+      total: progressObj.total
+    });
+  }
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  console.log('Update downloaded:', info);
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', { downloaded: true });
+    dialog.showMessageBox(mainWindow, {
+      type: 'info',
+      title: 'Update Ready',
+      message: 'The update has been downloaded.',
+      detail: 'The application will restart to install the update.',
+      buttons: ['Restart Now', 'Later']
+    }).then((result) => {
+      if (result.response === 0) {
+        autoUpdater.quitAndInstall();
+      }
+    });
+  }
+});
 
 // IPC Handlers
 ipcMain.handle('get-app-version', () => {
   return app.getVersion();
 });
 
-ipcMain.handle('check-for-updates', () => {
-  // Auto-updater disabled
-  return { message: 'Auto-updater disabled in this build' };
+ipcMain.handle('check-for-updates', async () => {
+  try {
+    await autoUpdater.checkForUpdatesAndNotify();
+    return { success: true, message: 'Checking for updates...' };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('download-update', async () => {
+  try {
+    await autoUpdater.downloadUpdate();
+    return { success: true, message: 'Update download started...' };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('install-update', () => {
+  autoUpdater.quitAndInstall();
+  return { success: true, message: 'Installing update...' };
 });
 
 ipcMain.handle('get-update-status', () => {
@@ -155,7 +252,8 @@ ipcMain.handle('get-update-status', () => {
     checking: false,
     available: false,
     downloaded: false,
-    disabled: true
+    disabled: false,
+    error: null
   };
 });
 

@@ -13,11 +13,22 @@ module.exports = {
   win: {
     target: [
       {
-        target: "dir", 
+        target: "nsis", 
         arch: ["x64"]
       }
     ],
     forceCodeSigning: false
+  },
+  nsis: {
+    oneClick: false,
+    allowToChangeInstallationDirectory: true,
+    createDesktopShortcut: true,
+    createStartMenuShortcut: true
+  },
+  publish: {
+    provider: "github",
+    owner: "Shyamptdr0",
+    repo: "SoftwarePOS"
   },
   compression: "maximum",
   removePackageScripts: true

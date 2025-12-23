@@ -1,0 +1,71 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: apps/desktop/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd apps/web && npm ci
+        
+    - name: Build web app
+      run: |
+        cd apps/web
+        npm run build
+        
+    - name: Get version
+      id: version
+      run: |
+        if ("${{ github.ref }}" -like "refs/tags/*") {
+          echo "version=${{ github.ref_name }}" >> $env:GITHUB_OUTPUT
+        } else {
+          $date = Get-Date -Format "yyyyMMdd-HHmm"
+          echo "version=v1.0.0-$date" >> $env:GITHUB_OUTPUT
+        }
+      shell: powershell
+      
+    - name: Build Electron app
+      run: |
+        cd apps/desktop
+        npm run build:win
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Shreem POS ${{ steps.version.outputs.version }}
+        body: |
+          ## Changes in this release
+          - Automatic update from main branch build
+          - Web app deployed to Vercel
+          - Electron installer with auto-update support
+          
+          ### Installation
+          1. Download the `.exe` file below
+          2. Run the installer
+          3. The app will automatically check for updates on startup
+        files: apps/desktop/dist/*.exe
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
